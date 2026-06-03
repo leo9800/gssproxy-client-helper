@@ -35,7 +35,6 @@ int main(int argc, char const *argv[])
 	char *pwbuf = NULL;
 	char *old_ktpath, *new_ktpath, *krb5_ktpath;
 	char *raw_principal;
-	krb5_error_code ret;
 	krb5_data password;
 	krb5_context context;
 	krb5_keytab keytab;
