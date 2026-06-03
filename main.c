@@ -154,7 +154,6 @@ static inline krb5_keytab_entry *create_keytab_entry(
 	krb5_keytab_entry *entry = malloc(sizeof(krb5_keytab_entry));
 	krb5_data salt;
 	krb5_keyblock key;
-	krb5_error_code ret;
 
 	if (!entry) exit(EXIT_FAILURE);
 	memset(entry, 0, sizeof(krb5_keytab_entry));
@@ -162,23 +161,9 @@ static inline krb5_keytab_entry *create_keytab_entry(
 	entry->vno = kvno;
 	entry->key.enctype = enctype;
 
-	ret = krb5_c_keylengths(context, entry->key.enctype, NULL, (size_t *) &entry->key.length);
-	if (ret) {
-		com_err("krb5_c_keylengths", ret, "while converting password to key");
-		exit(EXIT_FAILURE);
-	}
-
-	ret = krb5_principal2salt(context, principal, &salt);
-	if (ret) {
-		com_err("krb5_principal2salt", ret, "while generating salt from principal");
-		exit(EXIT_FAILURE);
-	}
-
-	ret = krb5_c_string_to_key(context, entry->key.enctype, &password, &salt, &key);
-	if (ret) {
-		com_err("krb5_c_string_to_key", ret, "while converting password to key");
-		exit(EXIT_FAILURE);
-	}
+	checkret(krb5_c_keylengths(context, entry->key.enctype, NULL, (size_t *) &entry->key.length));
+	checkret(krb5_principal2salt(context, principal, &salt));
+	checkret(krb5_c_string_to_key(context, entry->key.enctype, &password, &salt, &key));
 
 	entry->key.contents = key.contents;
 	krb5_free_data_contents(context, &salt);
